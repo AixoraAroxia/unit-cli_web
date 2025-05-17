@@ -136,5 +136,3 @@ Puedes descargar el archivo aquí:
 ## License
 
 This project is licensed under the Apache License 2.0 - see the [LICENSE](https://www.apache.org/licenses/LICENSE-2.0) file for details.
-
-
