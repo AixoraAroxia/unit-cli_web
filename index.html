@@ -1,0 +1,593 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UnitCLI - Unit Test Generator for Java</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;700&family=Roboto:wght@400;700&display=swap');
+
+        :root {
+            --primary-color: #007bff;
+            --primary-hover-color: #0056b3;
+            --secondary-color: #6c757d;
+            --background-color-light: #ffffff;
+            --text-color-light: #212529;
+            --card-background-light: #f8f9fa;
+            --border-color-light: #dee2e6;
+            --code-background-light: #e9ecef;
+            --code-color-light: #212529;
+
+            --background-color-dark: #1a1a1a;
+            --text-color-dark: #f8f9fa;
+            --card-background-dark: #2c2c2c;
+            --border-color-dark: #444444;
+            --code-background-dark: #333333;
+            --code-color-dark: #f0f0f0;
+            
+            --warning-bg-color: #fff3cd;
+            --warning-text-color: #856404;
+            --warning-border-color: #ffeeba;
+
+            --font-family-body: 'Roboto', sans-serif;
+            --font-family-mono: 'Roboto Mono', monospace;
+            --font-size-base: 16px;
+            --line-height-base: 1.6;
+            --border-radius: 0.3rem;
+        }
+
+        [data-theme="dark"] {
+            --background-color: var(--background-color-dark);
+            --text-color: var(--text-color-dark);
+            --card-background: var(--card-background-dark);
+            --border-color: var(--border-color-dark);
+            --code-background: var(--code-background-dark);
+            --code-color: var(--code-color-dark);
+            --primary-color: #3793ff;
+            --primary-hover-color: #1a75e0;
+        }
+        
+        [data-theme="light"] {
+            --background-color: var(--background-color-light);
+            --text-color: var(--text-color-light);
+            --card-background: var(--card-background-light);
+            --border-color: var(--border-color-light);
+            --code-background: var(--code-background-light);
+            --code-color: var(--code-color-light);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: var(--font-family-body);
+            font-size: var(--font-size-base);
+            line-height: var(--line-height-base);
+            background-color: var(--background-color);
+            color: var(--text-color);
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 20px 0;
+        }
+
+        /* Navigation Bar */
+        nav {
+            background-color: var(--card-background);
+            border-bottom: 1px solid var(--border-color);
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: background-color 0.3s, border-color 0.3s;
+        }
+
+        nav .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px; /* Add horizontal padding within nav container */
+        }
+        
+        nav .logo {
+            font-family: var(--font-family-mono);
+            font-weight: 700;
+            font-size: 1.5rem;
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+
+        nav ul {
+            list-style: none;
+            display: flex;
+            align-items: center;
+        }
+
+        nav ul li {
+            margin-left: 20px;
+        }
+
+        nav ul li a {
+            text-decoration: none;
+            color: var(--text-color);
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        nav ul li a:hover, nav ul li a.active {
+            color: var(--primary-color);
+        }
+
+        .theme-toggle {
+            background: none;
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            padding: 0.5rem;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-family: var(--font-family-mono);
+        }
+        .theme-toggle:hover {
+            background-color: var(--border-color);
+        }
+
+
+        /* Header */
+        header {
+            background-color: var(--card-background);
+            padding: 4rem 0 2rem;
+            text-align: center;
+            border-bottom: 1px solid var(--border-color);
+            transition: background-color 0.3s, border-color 0.3s;
+        }
+
+        header h1 {
+            font-family: var(--font-family-mono);
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            color: var(--primary-color);
+        }
+
+        header p {
+            font-size: 1.1rem;
+            color: var(--secondary-color);
+            max-width: 700px;
+            margin: 0 auto;
+        }
+        [data-theme="dark"] header p {
+             color: #aaa;
+        }
+
+
+        /* Sections */
+        section {
+            padding: 3rem 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+        section:last-of-type {
+            border-bottom: none;
+        }
+
+        section h2 {
+            font-family: var(--font-family-mono);
+            font-size: 2rem;
+            margin-bottom: 1.5rem;
+            color: var(--primary-color);
+            text-align: center;
+        }
+
+        ul, ol {
+            margin-left: 20px;
+            margin-bottom: 1rem;
+        }
+
+        li {
+            margin-bottom: 0.5rem;
+        }
+
+        /* Features & Benefits specific styling */
+        #features ul, #benefits ul {
+            list-style: none;
+            padding-left: 0;
+        }
+        #features li, #benefits li {
+            background-color: var(--card-background);
+            border: 1px solid var(--border-color);
+            padding: 1rem;
+            margin-bottom: 0.75rem;
+            border-radius: var(--border-radius);
+            transition: background-color 0.3s, border-color 0.3s;
+        }
+         #features li::before {
+            content: "✓ ";
+            color: var(--primary-color);
+            font-weight: bold;
+            margin-right: 0.5em;
+        }
+        #benefits li::before {
+            content: "🚀 "; /* Emoji as requested */
+            margin-right: 0.5em;
+        }
+
+
+        /* Installation Section */
+        .installation-columns {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 2rem;
+            margin-top: 1.5rem;
+        }
+
+        .installation-column {
+            flex: 1;
+            min-width: 300px;
+            background-color: var(--card-background);
+            padding: 1.5rem;
+            border-radius: var(--border-radius);
+            border: 1px solid var(--border-color);
+            transition: background-color 0.3s, border-color 0.3s;
+        }
+
+        .installation-column h3 {
+            font-family: var(--font-family-mono);
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: var(--text-color);
+        }
+
+        code, pre {
+            font-family: var(--font-family-mono);
+            background-color: var(--code-background);
+            color: var(--code-color);
+            padding: 0.2em 0.4em;
+            border-radius: var(--border-radius);
+            font-size: 0.9em;
+        }
+
+        pre {
+            padding: 1rem;
+            overflow-x: auto;
+            margin-bottom: 1rem;
+            border: 1px solid var(--border-color);
+        }
+
+        /* Download Button */
+        .download-button {
+            display: inline-block;
+            background-color: var(--primary-color);
+            color: white;
+            padding: 1rem 2rem;
+            font-size: 1.25rem;
+            font-weight: 700;
+            text-decoration: none;
+            border-radius: var(--border-radius);
+            transition: background-color 0.2s ease-in-out;
+            border: none;
+            cursor: pointer;
+            text-align: center;
+            margin-top: 1rem;
+        }
+
+        .download-button:hover {
+            background-color: var(--primary-hover-color);
+        }
+        
+        #download .container {
+            text-align: center;
+        }
+
+        /* Beta Notice */
+        .beta-notice {
+            background-color: var(--warning-bg-color);
+            color: var(--warning-text-color);
+            border: 1px solid var(--warning-border-color);
+            padding: 1rem;
+            margin-top: 2rem;
+            border-radius: var(--border-radius);
+            text-align: left;
+        }
+        .beta-notice strong {
+            color: var(--warning-text-color);
+        }
+        [data-theme="dark"] .beta-notice {
+            background-color: #4d3c00; /* Darker yellow for dark theme */
+            color: #ffeeba;
+            border-color: #856404;
+        }
+        [data-theme="dark"] .beta-notice strong {
+            color: #ffeeba;
+        }
+        .version-number { /* For easy editing */
+            font-weight: bold;
+        }
+
+
+        /* Footer */
+        footer {
+            background-color: var(--card-background);
+            color: var(--secondary-color);
+            padding: 2rem 0;
+            text-align: center;
+            border-top: 1px solid var(--border-color);
+            transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+        }
+        [data-theme="dark"] footer {
+             color: #aaa;
+        }
+
+        footer p {
+            margin-bottom: 0.5rem;
+        }
+
+        footer a {
+            color: var(--primary-color);
+            text-decoration: none;
+            margin: 0 0.5rem;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            nav .container {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            nav ul {
+                margin-top: 1rem;
+                flex-direction: column;
+                width: 100%;
+            }
+            nav ul li {
+                margin-left: 0;
+                margin-bottom: 0.5rem;
+                width: 100%;
+            }
+            nav ul li a {
+                display: block;
+                padding: 0.5rem 0;
+            }
+            .theme-toggle {
+                position: absolute;
+                top: 1rem;
+                right: 1rem;
+            }
+
+            header h1 {
+                font-size: 2rem;
+            }
+            header p {
+                font-size: 1rem;
+            }
+
+            section h2 {
+                font-size: 1.75rem;
+            }
+
+            .installation-columns {
+                flex-direction: column;
+            }
+        }
+
+    </style>
+</head>
+<body>
+
+    <nav>
+        <div class="container">
+            <a href="#home" class="logo">UnitCLI</a>
+            <ul>
+                <li><a href="#home">Home</a></li>
+                <li><a href="#features">Features</a></li>
+                <li><a href="#installation">Installation</a></li>
+                <li><a href="#project-structure">Project Structure</a></li>
+                <li><a href="#download">Download</a></li>
+                <li><button class="theme-toggle" id="themeToggle">☀️ Light / 🌙 Dark</button></li>
+            </ul>
+        </div>
+    </nav>
+
+    <header id="home">
+        <div class="container">
+            <h1>UnitCLI – Unit Test Generator for Java</h1>
+            <p>UnitCLI is a powerful command-line tool designed for Java developers to streamline and accelerate the creation of unit tests. It automatically generates well-structured test cases using JUnit and Mockito, allowing you to focus on building robust applications while maintaining high code quality.</p>
+        </div>
+    </header>
+
+    <main>
+        <section id="features">
+            <div class="container">
+                <h2>Key Features</h2>
+                <ul>
+                    <li>Quickly generate unit tests for your classes.</li>
+                    <li>Choose between Mockito or plain JUnit based testing.</li>
+                    <li>Analyze your project to get a summary of all classes.</li>
+                    <li>Explore your project's folder structure visually via the CLI.</li>
+                    <li>Improve test coverage and code reliability.</li>
+                </ul>
+            </div>
+        </section>
+
+        <section id="benefits">
+            <div class="container">
+                <h2>🚀 Benefits of Using UnitCLI</h2>
+                <ul>
+                    <li>Faster development cycles: Automate the creation of repetitive test code.</li>
+                    <li>Increased code quality: Catch bugs earlier with consistent unit testing.</li>
+                    <li>Safe refactoring: Make changes confidently, knowing that automated tests cover your code.</li>
+                    <li>Documentation through tests: Unit tests act as living documentation for how your code behaves.</li>
+                    <li>Simplified test setup: Ready-to-use CLI for macOS and Windows makes integration easy.</li>
+                </ul>
+            </div>
+        </section>
+
+        <section id="installation">
+            <div class="container">
+                <h2>💻 Installation Instructions</h2>
+
+  <div class="installation-column">
+    
+                        <ol>
+                            <li>Unzip the distribution: <pre><code>unzip unit-test-dist.zip -d unit-test-dist</code></pre></li>
+                    </div>
+
+                <div class="installation-columns">
+                    <div class="installation-column">
+                        <h3>macOS</h3>
+                        <ol>
+                            <li>Navigate to the CLI directory: <pre><code>cd unit-test-dist/cli</code></pre> (Adjusted path for clarity)</li>
+                            <li>Install: <pre><code>sudo ./unit install</code></pre> (Assuming 'unit' is executable inside 'cli')</li>
+                        </ol>
+                        <h4>Usage after installation:</h4>
+                        <pre><code>unit [command] [options]</code></pre>
+                        <p>Commands:</p>
+                        <ul>
+                            <li><code>install</code> Install the application</li>
+                            <li><code>uninstall</code> Remove the application</li>
+                            <li><code>--version, -v</code> Show version</li>
+                            <li><code>--help, -h</code> Show this help</li>
+                        </ul>
+                    </div>
+                    <div class="installation-column">
+                        <h3>Windows</h3>
+                        <ol>
+                            <li>Open CMD or PowerShell as Administrator.</li>
+                            <li>Run: <pre><code>cli\unit.bat install</code></pre> (Assuming from unzipped root)</li>
+                        </ol>
+                        <h4>Usage after installation:</h4>
+                        <pre><code>unit [command]</code></pre>
+                        <p>Commands:</p>
+                        <ul>
+                            <li><code>install</code> Install the application</li>
+                            <li><code>uninstall</code> Remove the application</li>
+                            <li><code>--version</code> Show version</li>
+                            <li><code>--help</code> Show this help</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <section id="project-structure">
+            <div class="container">
+                <h2>Project Structure Visualization</h2>
+                <p>UnitCLI allows you to explore your project's folder structure visually directly from the command line. This feature helps you understand the organization of your Java project and locate classes more easily.</p>
+                <p>More details and examples of this feature will be available soon.</p>
+            </div>
+        </section>
+
+        <section id="download">
+            <div class="container">
+                <h2>📦 Download UnitCLI</h2>
+                <a href="#" class="download-button">Download UnitCLI (<span class="version-number">1.0.0.0 Beta</span>)</a>
+                <div class="beta-notice">
+                    <p><strong>Note: You are using version <span class="version-number">1.0.0.0 Beta</span>.</strong> This version is under active development. Expect improvements, new features, and fixes in upcoming stable releases. Feedback is welcome!</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>Created with ❤️ for the Java developer community.</p>
+            <p>
+                <a href="#" target="_blank">[GitHub]</a>
+                <a href="mailto:contact@example.com">[Email Contact]</a>
+            </p>
+            <p>&copy; <span id="currentYear"></span> UnitCLI. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Set current year in footer
+        document.getElementById('currentYear').textContent = new Date().getFullYear();
+
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('nav a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const targetId = this.getAttribute('href');
+                const targetElement = document.querySelector(targetId);
+                if (targetElement) {
+                    targetElement.scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+        
+        // Theme Toggle
+        const themeToggle = document.getElementById('themeToggle');
+        const currentTheme = localStorage.getItem('theme') ? localStorage.getItem('theme') : null;
+        const prefersDarkScheme = window.matchMedia("(prefers-color-scheme: dark)");
+
+        function applyTheme(theme) {
+            if (theme === 'dark') {
+                document.documentElement.setAttribute('data-theme', 'dark');
+                localStorage.setItem('theme', 'dark');
+            } else {
+                document.documentElement.setAttribute('data-theme', 'light');
+                localStorage.setItem('theme', 'light');
+            }
+        }
+
+        if (currentTheme) {
+            applyTheme(currentTheme);
+        } else {
+             if (prefersDarkScheme.matches) {
+                applyTheme('dark');
+            } else {
+                applyTheme('light');
+            }
+        }
+
+        themeToggle.addEventListener('click', () => {
+            let newTheme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+            applyTheme(newTheme);
+        });
+
+        // Update active nav link on scroll (optional, but nice)
+        const sections = document.querySelectorAll('section[id], header[id]');
+        const navLinks = document.querySelectorAll('nav ul li a');
+
+        window.addEventListener('scroll', () => {
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                const sectionHeight = section.clientHeight;
+                // Trigger a bit before it hits the top for better UX
+                if (pageYOffset >= (sectionTop - sectionHeight / 3)) {
+                    current = section.getAttribute('id');
+                }
+            });
+
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href').substring(1) === current) {
+                    link.classList.add('active');
+                }
+            });
+             // Special case for top of page / home
+            if (window.pageYOffset < sections[0].offsetTop - sections[0].clientHeight / 3) {
+                navLinks.forEach(link => link.classList.remove('active'));
+                document.querySelector('nav ul li a[href="#home"]').classList.add('active');
+            }
+        });
+
+
+    </script>
+</body>
+</html>
