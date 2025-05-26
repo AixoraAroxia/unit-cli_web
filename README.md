@@ -126,6 +126,7 @@ unit [command]
 * Interactive test configuration
 * IDE plugins for IntelliJ and Eclipse
 
+
 Download
 You can download the file here:
 👉 [Download ZIP](https://github.com/AixoraAroxia/unit_cli/releases/download/version/unit-test-dist.zip)
@@ -134,5 +135,3 @@ You can download the file here:
 ## License
 
 This project is licensed under the Apache License 2.0 - see the [LICENSE](https://www.apache.org/licenses/LICENSE-2.0) file for details.
-
-
